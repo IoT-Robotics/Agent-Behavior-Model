@@ -61,7 +61,7 @@ Repository = 'https://GitHub.com/IoT-Robotics/Agent-Behavior-Model'
 
 
 [project.scripts]
-robotmesh-vex = 'abm.cli:abm_cli'
+abm = 'abm.cli:abm_cli'
 
 
 [project.optional-dependencies]
