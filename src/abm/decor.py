@@ -6,8 +6,8 @@ from enum import IntEnum
 from functools import wraps
 from inspect import FullArgSpec, getfullargspec
 import json
-from typing import Any, Callable, Optional, TypeVar
 import re
+from typing import Any, Callable, Optional, TypeVar
 
 
 __all__: Sequence[str] = 'act', 'sense', 'STATE_SEQ'
@@ -20,6 +20,7 @@ CallableTypeVar = TypeVar('CallableTypeVar', bound=Callable[..., Any])
 STATE_SEQ: list = []
 
 
+# *** TODO: make this independent of VEX Robotics ***
 def stringify_device_or_enum(obj: Any) -> str:
     """Stringify device or enum."""
     # pylint: disable=import-outside-toplevel

@@ -12,7 +12,7 @@ from pathlib import Path
 from pprint import pprint
 from typing import Optional
 
-import abm.decor
+from . import decor
 
 
 __all__: Sequence[str] = 'exec_and_get_state_seq', 'compare_output'
@@ -50,8 +50,8 @@ def exec_and_get_state_seq(
                   opener=None) as file:
             exec(file.read())
 
-    state_seq: list = abm.decor.STATE_SEQ
-    abm.decor.STATE_SEQ = []
+    state_seq: list = decor.STATE_SEQ
+    decor.STATE_SEQ: list = []
 
     print()
     pprint(object=state_seq,
