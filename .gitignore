@@ -13,3 +13,4 @@ docs/
 
 # Visual Studio Code
 .vscode/*.log
+*.code-workspace

@@ -93,6 +93,8 @@ def sense(sensing_func: CallableTypeVar) -> CallableTypeVar:
     def decor_sensing_func(*given_args, set=None):
         # pylint: disable=import-outside-toplevel,redefined-builtin
         # pylint: disable=too-many-locals
+
+        # *** TODO: make this independent of VEX Robotics ***
         from vex import interactive
 
         args_dict: dict[str, Any] = \
