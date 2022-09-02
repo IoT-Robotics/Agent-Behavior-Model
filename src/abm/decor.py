@@ -2,7 +2,7 @@
 
 
 from collections.abc import Sequence
-from enum import IntEnum
+from enum import Enum
 from functools import wraps
 from inspect import FullArgSpec, getfullargspec
 import json
@@ -24,10 +24,11 @@ STATE_SEQ: list = []
 def stringify_device_or_enum(obj: Any) -> str:
     """Stringify device or enum."""
     # pylint: disable=import-outside-toplevel
-    from vex.abstract import Device, SingletonDevice   # avoid circular import
+    # avoid circular import
+    from vex._abstract_device import Device, SingletonDevice
 
     return (str(obj)
-            if isinstance(obj, Device | SingletonDevice | IntEnum)
+            if isinstance(obj, Device | SingletonDevice | Enum)
             else (f'"{obj}"'
                   if isinstance(obj, str)
                   else obj))
