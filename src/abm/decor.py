@@ -2,7 +2,6 @@
 
 
 from collections.abc import Sequence
-from enum import Enum
 from functools import wraps
 from inspect import FullArgSpec, getfullargspec
 import json
@@ -20,20 +19,6 @@ CallableTypeVar = TypeVar('CallableTypeVar', bound=Callable[..., Any])
 
 
 STATE_SEQ: list = []
-
-
-# *** TODO: make this independent of VEX Robotics ***
-def stringify_device_or_enum(obj: Any) -> str:
-    """Stringify device or enum."""
-    # pylint: disable=import-outside-toplevel
-    # avoid circular import
-    from vex._abstract_device import Device, SingletonDevice
-
-    return (str(obj)
-            if isinstance(obj, Device | SingletonDevice | Enum)
-            else (f'"{obj}"'
-                  if isinstance(obj, str)
-                  else obj))
 
 
 def args_dict_from_func_and_given_args(func: CallableTypeVar,
@@ -69,8 +54,7 @@ def act(actuating_func: CallableTypeVar) -> CallableTypeVar:
 
         print_args: dict[str, Any] = args_dict.copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
-        input_arg_strs: list[str] = [f'{k}={stringify_device_or_enum(v)}'
-                                     for k, v in print_args.items()]
+        input_arg_strs: list[str] = [f'{k}={v}' for k, v in print_args.items()]
         self_name: Optional[str] = sanitize_object_name(self_arg)
         print((f'ACT: {self_name}.' if self_name else 'ACT: ') +
               f"{actuating_func.__name__}({', '.join(input_arg_strs)})")
@@ -118,8 +102,7 @@ def sense(sensing_func: CallableTypeVar) -> CallableTypeVar:
         # tuple & str forms of input args
         input_arg_tuple: tuple[tuple[str, Any], ...] = \
             tuple(input_arg_dict_items := print_args.items())
-        input_arg_strs: list[str] = [f'{k}={stringify_device_or_enum(v)}'
-                                     for k, v in input_arg_dict_items]
+        input_arg_strs: list[str] = [f'{k}={v}' for k, v in input_arg_dict_items]   # noqa: E501
 
         if set is None:
             return_annotation: Optional[type] = \
