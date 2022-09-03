@@ -9,6 +9,8 @@ import json
 import re
 from typing import Any, Callable, Optional, TypeVar
 
+from . import interactive
+
 
 __all__: Sequence[str] = 'act', 'sense', 'STATE_SEQ'
 
@@ -92,11 +94,7 @@ def sense(sensing_func: CallableTypeVar) -> CallableTypeVar:
 
     @wraps(sensing_func)
     def decor_sensing_func(*given_args, set=None):
-        # pylint: disable=import-outside-toplevel,redefined-builtin
-        # pylint: disable=too-many-locals
-
-        # *** TODO: make this independent of VEX Robotics ***
-        from vex import interactive
+        # pylint: disable=redefined-builtin
 
         args_dict: dict[str, Any] = \
             args_dict_from_func_and_given_args(func=sensing_func,
