@@ -42,7 +42,7 @@ def sanitize_object_name(obj: Any) -> Optional[str]:
             else re.sub(_OBJECT_MEMORY_PATTERN, '', str(obj)))
 
 
-def act(actuating_func: CallableTypeVar) -> CallableTypeVar:
+def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     """Actuation decorator."""
     # (use same signature for IDE code autocomplete to work)
 
@@ -69,7 +69,7 @@ def act(actuating_func: CallableTypeVar) -> CallableTypeVar:
     return decor_actuating_func
 
 
-def sense(sensing_func: CallableTypeVar) -> CallableTypeVar:
+def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     """Sensing decorator."""
     # (use same signature for IDE code autocomplete to work)
 
