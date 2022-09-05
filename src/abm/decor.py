@@ -18,6 +18,9 @@ _OBJECT_MEMORY_PATTERN: str = ' object at 0x([0-9]|[a-f]|[A-F])+'
 CallableTypeVar = TypeVar('CallableTypeVar', bound=Callable[..., Any])
 
 
+_ACT_DECOR_FLAG: str = '__ACT_DECORATED__'
+_SENSE_DECOR_FLAG: str = '__SENSE_DECORATED__'
+
 STATE_SEQ: list = []
 
 
@@ -42,9 +45,20 @@ def sanitize_object_name(obj: Any) -> Optional[str]:
             else re.sub(_OBJECT_MEMORY_PATTERN, '', str(obj)))
 
 
+def check_decor_status(func: callable, /) -> Optional[AssertionError]:
+    """Ensure function has NOT been `act`- or `sense`-decorated."""
+    assert not getattr(func, _ACT_DECOR_FLAG, False), \
+        f'*** {func} ALREADY `act`-DECORATED ***'
+
+    assert not getattr(func, _SENSE_DECOR_FLAG, False), \
+        f'*** {func} ALREADY `sense`-DECORATED ***'
+
+
 def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     """Actuation decorator."""
     # (use same signature for IDE code autocomplete to work)
+
+    check_decor_status(actuating_func)
 
     @wraps(actuating_func)
     def decor_actuating_func(*given_args) -> tuple[str, dict[str, Any]]:
@@ -66,12 +80,16 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
 
         return result
 
+    setattr(decor_actuating_func, _ACT_DECOR_FLAG, True)
+
     return decor_actuating_func
 
 
 def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     """Sensing decorator."""
     # (use same signature for IDE code autocomplete to work)
+
+    check_decor_status(sensing_func)
 
     # name of private dict storing current sensing states
     sensing_state_dict_name: str = f'_{(sensing_func_name := sensing_func.__name__)}'   # noqa: E501
@@ -151,5 +169,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         print(f'SET: {self_dot_str}{sensing_state_dict_name}'
               f"[{', '.join(input_arg_strs)}] = {set}")
         return None
+
+    setattr(decor_sensing_func, _SENSE_DECOR_FLAG, True)
 
     return decor_sensing_func
