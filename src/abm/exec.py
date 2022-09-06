@@ -48,7 +48,11 @@ def exec_and_get_state_seq(
                   newline=None,
                   closefd=True,
                   opener=None) as file:
-            exec(file.read())
+            # CUSTOMIZATION for Pybricks-based client code files
+            if 'pybricks' in (code_str := file.read()):
+                code_str: str = f'import pybricks.abm\n{code_str}'
+
+            exec(code_str)
 
     state_seq: list = decor.STATE_SEQ
     decor.STATE_SEQ: list = []
