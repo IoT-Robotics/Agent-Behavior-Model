@@ -65,8 +65,7 @@ def exec_and_get_state_seq(
            depth=None,
            compact=False,
            sort_dicts=False,
-           # underscore_numbers=True,   # Py3.10
-           )
+           underscore_numbers=True)
     print()
 
     return state_seq
