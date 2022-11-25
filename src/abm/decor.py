@@ -25,14 +25,15 @@ STATE_SEQ: list = []
 
 
 def args_dict_from_func_and_given_args(func: CallableTypeVar,
-                                       given_args: Sequence[Any]) -> dict[str, Any]:   # noqa: E501
+                                       *args: Any, **kwargs: Any) -> dict[str, Any]:  # noqa: E501
     """Get arguments dict from function and given arguments."""
     arg_spec: FullArgSpec = getfullargspec(func)
-    arg_names: list[str] = arg_spec.args
+    pos_arg_names: list[str] = arg_spec.args
 
-    args_dict: dict[str, Any] = {arg_names[i]: v for i, v in enumerate(given_args)}   # noqa: E501
-    if (n_defaults_to_use := len(arg_names) - len(given_args)) > 0:
-        args_dict.update(zip(arg_names[-n_defaults_to_use:],
+    args_dict: dict[str, Any] = {pos_arg_names[i]: v
+                                 for i, v in enumerate(args)}
+    if (n_defaults_to_use := len(pos_arg_names) - len(args)) > 0:
+        args_dict.update(zip(pos_arg_names[-n_defaults_to_use:],
                              arg_spec.defaults[-n_defaults_to_use:]))
 
     return args_dict
@@ -61,10 +62,9 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(actuating_func)
 
     @wraps(actuating_func)
-    def decor_actuating_func(*given_args) -> tuple[str, dict[str, Any]]:
+    def decor_actuating_func(*args, **kwargs) -> tuple[str, dict[str, Any]]:
         args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(func=actuating_func,
-                                               given_args=given_args)
+            args_dict_from_func_and_given_args(func=actuating_func, *args, **kwargs)  # noqa: E501
 
         print_args: dict[str, Any] = args_dict.copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
@@ -75,7 +75,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
 
         result: tuple[str, dict] = actuating_func.__qualname__, args_dict
 
-        global STATE_SEQ   # pylint: disable=global-variable-not-assigned
+        global STATE_SEQ  # pylint: disable=global-variable-not-assigned
         STATE_SEQ.append(result)
 
         return result
@@ -92,15 +92,14 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(sensing_func)
 
     # name of private dict storing current sensing states
-    sensing_state_dict_name: str = f'_{(sensing_func_name := sensing_func.__name__)}'   # noqa: E501
+    sensing_state_dict_name: str = f'_{(sensing_func_name := sensing_func.__name__)}'  # noqa: E501
 
     @wraps(sensing_func)
-    def decor_sensing_func(*given_args, set=None):
-        # pylint: disable=redefined-builtin
+    def decor_sensing_func(*args, set=None, **kwargs):
+        # pylint: disable=redefined-builtin,too-many-locals
 
         args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(func=sensing_func,
-                                               given_args=given_args)
+            args_dict_from_func_and_given_args(func=sensing_func, *args, **kwargs)  # noqa: E501
 
         print_args: dict[str, Any] = args_dict.copy()
 
@@ -114,13 +113,13 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
         # private dict storing current sensing states
         if (sensing_state_dict :=
-            getattr(self, sensing_state_dict_name, None)) is None:   # noqa: E129,E501
+            getattr(self, sensing_state_dict_name, None)) is None:  # noqa: E129,E501
             setattr(self, sensing_state_dict_name, (sensing_state_dict := {}))
 
         # tuple & str forms of input args
         input_arg_tuple: tuple[tuple[str, Any], ...] = \
             tuple(input_arg_dict_items := print_args.items())
-        input_arg_strs: list[str] = [f'{k}={v}' for k, v in input_arg_dict_items]   # noqa: E501
+        input_arg_strs: list[str] = [f'{k}={v}' for k, v in input_arg_dict_items]  # noqa: E501
 
         if set is None:
             return_annotation: Optional[type] = \
@@ -155,12 +154,12 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
             else:
                 # fully execute the sensing function on the given arguments
-                return_value = sensing_func(*given_args)
+                return_value = sensing_func(*args, **kwargs)
 
                 print(f'{print_str}{return_value}')
 
-            global STATE_SEQ   # pylint: disable=global-variable-not-assigned
-            STATE_SEQ.append((sensing_func.__qualname__, args_dict, return_value))   # noqa: E501
+            global STATE_SEQ  # pylint: disable=global-variable-not-assigned
+            STATE_SEQ.append((sensing_func.__qualname__, args_dict, return_value))  # noqa: E501
 
             return return_value
 
