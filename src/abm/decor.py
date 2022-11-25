@@ -26,15 +26,43 @@ STATE_SEQ: list = []
 
 def args_dict_from_func_and_given_args(func: CallableTypeVar,
                                        *args: Any, **kwargs: Any) -> dict[str, Any]:  # noqa: E501
+    # pylint: disable=too-many-locals
     """Get arguments dict from function and given arguments."""
+    # extract function's argument specs
     arg_spec: FullArgSpec = getfullargspec(func)
     pos_arg_names: list[str] = arg_spec.args
+    pos_arg_defaults: Optional[tuple[Any]] = arg_spec.defaults
+    pos_var_args: Optional[str] = arg_spec.varargs
+    # kw_only_arg_names: list[str] = arg_spec.kwonlyargs
+    kw_only_arg_defaults: Optional[dict[str, Any]] = arg_spec.kwonlydefaults
+    # kw_only_var_arg_name: Optional[str] = arg_spec.varkw
 
-    args_dict: dict[str, Any] = {pos_arg_names[i]: v
-                                 for i, v in enumerate(args)}
-    if (n_defaults_to_use := len(pos_arg_names) - len(args)) > 0:
-        args_dict.update(zip(pos_arg_names[-n_defaults_to_use:],
-                             arg_spec.defaults[-n_defaults_to_use:]))
+    # get number of matched positional arguments
+    n_matched_pos_args: int = min(n_pos_arg_names := len(pos_arg_names),
+                                  n_args := len(args))
+
+    # initialize args_dict with matched positional arguments and given kwargs
+    args_dict: dict[str, Any] = dict(zip(pos_arg_names[:n_matched_pos_args],
+                                         args[:n_matched_pos_args])) | kwargs
+
+    # insert argument defaults where applicable
+    if (n_pos_arg_defaults_to_consider := n_pos_arg_names - n_matched_pos_args) > 0:  # noqa: E501
+        # pylint: disable=invalid-name
+        for k, v in zip(pos_arg_names[-n_pos_arg_defaults_to_consider:],
+                        pos_arg_defaults[-n_pos_arg_defaults_to_consider:]):
+            if k not in args_dict:
+                args_dict[k] = v
+
+    # record positional varargs where applicable
+    if pos_var_args and ((n_var_args := n_args - n_matched_pos_args) > 0):
+        args_dict['VARARGS'] = args[-n_var_args:]
+
+    # insert keyword-only argument defaults where applicable
+    if kw_only_arg_defaults:
+        # pylint: disable=invalid-name
+        for k, v in kw_only_arg_defaults.items():
+            if k not in args_dict:
+                args_dict[k] = v
 
     return args_dict
 
@@ -64,7 +92,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     @wraps(actuating_func)
     def decor_actuating_func(*args, **kwargs) -> tuple[str, dict[str, Any]]:
         args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(func=actuating_func, *args, **kwargs)  # noqa: E501
+            args_dict_from_func_and_given_args(actuating_func, *args, **kwargs)
 
         print_args: dict[str, Any] = args_dict.copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
@@ -99,7 +127,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         # pylint: disable=redefined-builtin,too-many-locals
 
         args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(func=sensing_func, *args, **kwargs)  # noqa: E501
+            args_dict_from_func_and_given_args(sensing_func, *args, **kwargs)
 
         print_args: dict[str, Any] = args_dict.copy()
 
