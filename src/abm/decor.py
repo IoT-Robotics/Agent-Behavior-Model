@@ -90,7 +90,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(actuating_func)
 
     @wraps(actuating_func)
-    def decor_actuating_func(*args, **kwargs) -> tuple[str, dict[str, Any]]:
+    def decor_actuating_func(*args: Any, **kwargs: Any) -> tuple[str, dict[str, Any]]:  # noqa: E501
         args_dict: dict[str, Any] = \
             args_dict_from_func_and_given_args(actuating_func, *args, **kwargs)
 
@@ -123,7 +123,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     sensing_state_dict_name: str = f'_{(sensing_func_name := sensing_func.__name__)}'  # noqa: E501
 
     @wraps(sensing_func)
-    def decor_sensing_func(*args, set=None, **kwargs):
+    def decor_sensing_func(*args: Any, set: Any = None, **kwargs: Any) -> Any:
         # pylint: disable=redefined-builtin,too-many-locals
 
         args_dict: dict[str, Any] = \
