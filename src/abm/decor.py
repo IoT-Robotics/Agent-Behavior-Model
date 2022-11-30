@@ -91,6 +91,8 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
 
     @wraps(actuating_func)
     def decor_actuating_func(*args: Any, **kwargs: Any) -> tuple[str, dict[str, Any]]:  # noqa: E501
+        actuating_func(*args, **kwargs)
+
         args_dict: dict[str, Any] = \
             args_dict_from_func_and_given_args(actuating_func, *args, **kwargs)
 
