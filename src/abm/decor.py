@@ -127,6 +127,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     @wraps(sensing_func)
     def decor_sensing_func(*args: Any, set: Any = None, **kwargs: Any) -> Any:
         # pylint: disable=redefined-builtin,too-many-locals
+        result: Any = sensing_func(*args, **kwargs)
 
         args_dict: dict[str, Any] = \
             args_dict_from_func_and_given_args(sensing_func, *args, **kwargs)
@@ -180,11 +181,11 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
             elif interactive.ON:
                 # ask user for direct input
-                return_value = json.loads(input(f'{print_str}? (in JSON)   '))
+                return_value: Any = json.loads(input(f'{print_str}? (in JSON)   '))  # noqa: E501
 
             else:
-                # fully execute the sensing function on the given arguments
-                return_value = sensing_func(*args, **kwargs)
+                # return the sensing function's result
+                return_value: Any = result
 
                 print(f'{print_str}{return_value}')
 
