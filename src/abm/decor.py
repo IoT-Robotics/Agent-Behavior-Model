@@ -26,39 +26,34 @@ STATE_SEQ: list = []
 
 def args_dict_from_func_and_given_args(func: CallableTypeVar,
                                        *args: Any, **kwargs: Any) -> dict[str, Any]:  # noqa: E501
-    # pylint: disable=too-many-locals
     """Get arguments dict from function and given arguments."""
     # extract function's argument specs
-    arg_spec: FullArgSpec = getfullargspec(func)
-    pos_arg_names: list[str] = arg_spec.args
-    pos_arg_defaults: Optional[tuple[Any]] = arg_spec.defaults
-    pos_var_args: Optional[str] = arg_spec.varargs
+    arg_spec: FullArgSpec = getfullargspec(func=func)
     # kw_only_arg_names: list[str] = arg_spec.kwonlyargs
-    kw_only_arg_defaults: Optional[dict[str, Any]] = arg_spec.kwonlydefaults
     # kw_only_var_arg_name: Optional[str] = arg_spec.varkw
 
     # get number of matched positional arguments
-    n_matched_pos_args: int = min(n_pos_arg_names := len(pos_arg_names),
+    n_matched_pos_args: int = min(len(pos_arg_names := arg_spec.args),
                                   n_args := len(args))
 
     # initialize args_dict with matched positional arguments and given kwargs
     args_dict: dict[str, Any] = dict(zip(pos_arg_names[:n_matched_pos_args],
                                          args[:n_matched_pos_args])) | kwargs
 
-    # insert argument defaults where applicable
-    if (n_pos_arg_defaults_to_consider := n_pos_arg_names - n_matched_pos_args) > 0:  # noqa: E501
+    # insert positional argument defaults where applicable
+    if (pos_arg_defaults_tup := arg_spec.defaults):
         # pylint: disable=invalid-name
-        for k, v in zip(pos_arg_names[-n_pos_arg_defaults_to_consider:],
-                        pos_arg_defaults[-n_pos_arg_defaults_to_consider:]):
+        for k, v in zip(pos_arg_names[-len(pos_arg_defaults_tup):],
+                        pos_arg_defaults_tup):
             if k not in args_dict:
                 args_dict[k] = v
 
     # record positional varargs where applicable
-    if pos_var_args and ((n_var_args := n_args - n_matched_pos_args) > 0):
+    if arg_spec.varargs and ((n_var_args := n_args - n_matched_pos_args) > 0):
         args_dict['VARARGS'] = args[-n_var_args:]
 
     # insert keyword-only argument defaults where applicable
-    if kw_only_arg_defaults:
+    if (kw_only_arg_defaults := arg_spec.kwonlydefaults):
         # pylint: disable=invalid-name
         for k, v in kw_only_arg_defaults.items():
             if k not in args_dict:
