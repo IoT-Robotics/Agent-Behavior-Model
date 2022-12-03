@@ -47,7 +47,7 @@ dependencies = [
   'Decorator >= 5.1.1',
   'Wrapt >= 1.14.1',
 
-  'EdX-CodeJail >= 3.2.0',
+  'EdX-CodeJail >= 3.3.1',
 ]
 
 
@@ -65,18 +65,18 @@ abm = 'abm.cli:abm_cli'
 [project.optional-dependencies]
 devtest = [
   'Nose2 >= 0.12.0',
-  'PyTest >= 7.1.2',
+  'PyTest >= 7.2.0',
 ]
 
 publish = [
-  'Build >= 0.8.0',
-  'Twine >= 4.0.1',
+  'Build >= 0.9.0',
+  'Twine >= 4.0.2',
 ]
 
 
 [build-system]
 requires = [
-  'SetUpTools >= 65.3.0',
-  'Wheel >= 0.37.1',
+  'SetUpTools >= 65.6.3',
+  'Wheel >= 0.38.4',
 ]
 build-backend = 'setuptools.build_meta'
