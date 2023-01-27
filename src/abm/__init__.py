@@ -9,4 +9,4 @@ from typing import LiteralString
 __all__: Sequence[LiteralString] = ('__version__',)
 
 
-__version__: str = version(distribution_name='Agent-Behavior-Model')
+__version__: LiteralString = version(distribution_name='Agent-Behavior-Model')

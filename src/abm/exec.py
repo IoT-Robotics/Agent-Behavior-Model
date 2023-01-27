@@ -50,7 +50,7 @@ def exec_and_get_state_seq(
                   opener=None) as file:
             # CUSTOMIZATION for Pybricks-based client code files
             if 'pybricks' in (code_str := file.read()):
-                code_str: str = f'import pybricks.abm\n{code_str}'
+                code_str: LiteralString = f'import pybricks.abm\n{code_str}'
 
             exec(code_str)
 
@@ -71,7 +71,7 @@ def exec_and_get_state_seq(
     return state_seq
 
 
-def _name_or_attr_from_str(s: str, /) -> Name | Attribute:
+def _name_or_attr_from_str(s: LiteralString, /) -> Name | Attribute:
     str_components = s.split(sep='.', maxsplit=1)
 
     if len(str_components) == 1:

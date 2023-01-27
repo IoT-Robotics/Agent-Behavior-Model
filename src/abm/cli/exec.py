@@ -41,7 +41,7 @@ __all__: Sequence[LiteralString] = 'exec_and_get_state_seq', 'compare_output'
                 is_eager=False,
                 envvar=None,
                 shell_complete=None)
-def exec_and_get_state_seq(script_file_path: str):
+def exec_and_get_state_seq(script_file_path: LiteralString):
     """Execute script and get State Sequence."""
     return _exec_and_get_state_seq(module_obj_or_script_file_path=script_file_path)   # noqa: E501
 

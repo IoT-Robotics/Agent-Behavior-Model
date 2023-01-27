@@ -25,7 +25,7 @@ from codejail.jail_code import configure
 configure(command='python', bin_path=executable, user=getuser())
 
 # pylint: disable=wrong-import-position
-from codejail.safe_exec import SafeExecException, safe_exec   # noqa: E402
+from codejail.safe_exec import SafeExecException, safe_exec  # noqa: E402
 
 
 __all__: Sequence[LiteralString] = ('StateSeqGrader',)
@@ -34,25 +34,27 @@ __all__: Sequence[LiteralString] = ('StateSeqGrader',)
 class StateSeqGrader(Grader):
     """State-Sequence Grader."""
 
-    __full_qual_name__: str = f'{__name__}.{__qualname__}'
+    __full_qual_name__: LiteralString = f'{__name__}.{__qualname__}'
 
-    _GRADER_VAR_NAME: str = 'grader'
+    _GRADER_VAR_NAME: LiteralString = 'grader'
 
-    _SUBMISSION_FILE_TEST_FUNC_VAR_NAME: str = 'SUBMISSION_FILE_TEST_FUNC'
-    _SUBMISSION_FILE_TEST_RESULT_VAR_NAME: str = \
+    _SUBMISSION_FILE_TEST_FUNC_VAR_NAME: LiteralString = \
+        'SUBMISSION_FILE_TEST_FUNC'
+    _SUBMISSION_FILE_TEST_RESULT_VAR_NAME: LiteralString = \
         f'{_SUBMISSION_FILE_TEST_FUNC_VAR_NAME}_RESULT'
 
-    _SUBMISSION_MODULE_NAME: str = '_submission'
-    _SUBMISSION_MODULE_FILE_NAME: str = f'{_SUBMISSION_MODULE_NAME}.py'
+    _SUBMISSION_MODULE_NAME: LiteralString = '_submission'
+    _SUBMISSION_MODULE_FILE_NAME: LiteralString = f'{_SUBMISSION_MODULE_NAME}.py'  # noqa: E501
 
     def __init__(self,
-                 _unsafe_submission_file_test_func: Callable[[str | Path], bool], /):   # noqa: E501
+                 _unsafe_submission_file_test_func:
+                 Callable[[LiteralString | Path], bool], /):
         """Initialize State-Sequence Grader."""
         super().__init__()
 
         self.add_input_check(check=self.check_submission_str)
 
-        if hasattr(self, 'set_only_check_input'):   # S4V customization
+        if hasattr(self, 'set_only_check_input'):  # S4V customization
             self.set_only_check_input(value=True)
 
         # stackoverflow.com/a/56764010
@@ -85,12 +87,13 @@ class StateSeqGrader(Grader):
                 '*** SUBMISSION FILE TESTING FUNCTION MUST BE A LAMBDA ***'
 
             self.module.body.append(
-                Assign(targets=[Name(id=self._SUBMISSION_FILE_TEST_FUNC_VAR_NAME,   # noqa: E501
+                Assign(targets=[Name(id=self._SUBMISSION_FILE_TEST_FUNC_VAR_NAME,  # noqa: E501
                                      ctx=Store())],
                        value=submission_file_test_func_code,
                        type_comment=None))
 
-    def check_submission_str(self, submission_str: str, /) -> Optional[str]:
+    def check_submission_str(self, submission_str: LiteralString, /) \
+            -> Optional[LiteralString]:
         """Test submission string."""
         with NamedTemporaryFile(mode='wt',
                                 buffering=-1,
@@ -106,7 +109,7 @@ class StateSeqGrader(Grader):
         (_module := copy(self.module)).body.append(
             Assign(targets=[Name(id=self._SUBMISSION_FILE_TEST_RESULT_VAR_NAME,
                                  ctx=Store())],
-                   value=Call(func=Name(id=self._SUBMISSION_FILE_TEST_FUNC_VAR_NAME,   # noqa: E501
+                   value=Call(func=Name(id=self._SUBMISSION_FILE_TEST_FUNC_VAR_NAME,  # noqa: E501
                                         ctx=Load()),
                               args=[Constant(value=file.name)],
                               keywords=[],
@@ -115,7 +118,7 @@ class StateSeqGrader(Grader):
                    type_comment=None))
 
         try:
-            safe_exec(code=(unparse(ast_obj=fix_missing_locations(node=_module))   # noqa: E501
+            safe_exec(code=(unparse(ast_obj=fix_missing_locations(node=_module))  # noqa: E501
                             .replace('__file__', f"'{self.file_path}'")),
                       globals_dict=(_globals := {}),
                       files=None,
@@ -132,17 +135,17 @@ class StateSeqGrader(Grader):
             return (('*** SUBMISSION TAKES TOO LONG TO RUN '
                      '(LIKELY INFINITE LOOP) ***')
                     if (complaint_str := str(err)) in (
-                        "Couldn't execute jailed code: "   # Linux
+                        "Couldn't execute jailed code: "  # Linux
                         "stdout: b'', stderr: b'' with status code: -9",
-                        "Couldn't execute jailed code: "   # MacOS
+                        "Couldn't execute jailed code: "  # MacOS
                         "stdout: b'', stderr: b'' with status code: -24",
-                        )   # noqa: E123
+                        )  # noqa: E123
                     else complaint_str)
 
         finally:
             os.remove(path=file.name)
 
-    def __call__(self, submission_file_path: str | Path, /,
+    def __call__(self, submission_file_path: LiteralString | Path, /,
                  *, submission_only: bool = False):
         """Run State-Sequence Grader."""
         with change_directory(self.file_path.parent):

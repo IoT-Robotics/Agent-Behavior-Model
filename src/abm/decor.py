@@ -14,12 +14,12 @@ from . import interactive
 __all__: Sequence[LiteralString] = 'act', 'sense', 'STATE_SEQ'
 
 
-_OBJECT_MEMORY_PATTERN: str = ' object at 0x([0-9]|[a-f]|[A-F])+'
+_OBJECT_MEMORY_PATTERN: LiteralString = ' object at 0x([0-9]|[a-f]|[A-F])+'
 CallableTypeVar = TypeVar('CallableTypeVar', bound=Callable[..., Any])
 
 
-_ACT_DECOR_FLAG: str = '__ACT_DECORATED__'
-_SENSE_DECOR_FLAG: str = '__SENSE_DECORATED__'
+_ACT_DECOR_FLAG: LiteralString = '__ACT_DECORATED__'
+_SENSE_DECOR_FLAG: LiteralString = '__SENSE_DECORATED__'
 
 STATE_SEQ: list = []
 
@@ -117,7 +117,8 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(sensing_func)
 
     # name of private dict storing current sensing states
-    sensing_state_dict_name: str = f'_{(sensing_func_name := sensing_func.__name__)}'  # noqa: E501
+    sensing_state_dict_name: LiteralString = \
+        f'_{(sensing_func_name := sensing_func.__name__)}'
 
     @wraps(sensing_func)
     def decor_sensing_func(*args: Any, set: Any = None, **kwargs: Any) -> Any:
@@ -135,7 +136,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
         else:
             self: callable = sensing_func
-            self_dot_str: str = ''
+            self_dot_str: LiteralString = ''
 
         # private dict storing current sensing states
         if (sensing_state_dict :=
@@ -150,9 +151,9 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         if set is None:
             return_annotation: Optional[type] = \
                 sensing_func.__annotations__.get('return')
-            return_annotation_str: str = (f': {return_annotation}'
-                                          if return_annotation
-                                          else '')
+            return_annotation_str: LiteralString = (f': {return_annotation}'
+                                                    if return_annotation
+                                                    else '')
             print_str: str = (f'SENSE: {self_dot_str}{sensing_func_name}'
                               f"({', '.join(input_arg_strs)})"
                               f'{return_annotation_str} = ')
