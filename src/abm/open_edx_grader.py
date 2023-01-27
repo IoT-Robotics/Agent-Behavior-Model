@@ -14,7 +14,7 @@ from pprint import pprint
 from shutil import copyfile
 from sys import executable
 from tempfile import NamedTemporaryFile
-from typing import LiteralString, Optional
+from typing import LiteralString, Optional, Self
 
 from grader_support.gradelib import Grader
 from grader_support.graderutil import change_directory
@@ -46,7 +46,7 @@ class StateSeqGrader(Grader):
     _SUBMISSION_MODULE_NAME: LiteralString = '_submission'
     _SUBMISSION_MODULE_FILE_NAME: LiteralString = f'{_SUBMISSION_MODULE_NAME}.py'  # noqa: E501
 
-    def __init__(self,
+    def __init__(self: Self,
                  _unsafe_submission_file_test_func:
                  Callable[[LiteralString | Path], bool], /):
         """Initialize State-Sequence Grader."""
@@ -92,7 +92,7 @@ class StateSeqGrader(Grader):
                        value=submission_file_test_func_code,
                        type_comment=None))
 
-    def check_submission_str(self, submission_str: LiteralString, /) \
+    def check_submission_str(self: Self, submission_str: LiteralString, /) \
             -> Optional[LiteralString]:
         """Test submission string."""
         with NamedTemporaryFile(mode='wt',
@@ -145,7 +145,7 @@ class StateSeqGrader(Grader):
         finally:
             os.remove(path=file.name)
 
-    def __call__(self, submission_file_path: LiteralString | Path, /,
+    def __call__(self: Self, submission_file_path: LiteralString | Path, /,
                  *, submission_only: bool = False):
         """Run State-Sequence Grader."""
         with change_directory(self.file_path.parent):
