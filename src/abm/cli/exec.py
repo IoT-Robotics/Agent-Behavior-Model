@@ -3,7 +3,7 @@
 
 from collections.abc import Sequence
 import json
-from typing import Optional
+from typing import LiteralString, Optional
 
 import click
 
@@ -11,7 +11,7 @@ from abm.exec import (exec_and_get_state_seq as _exec_and_get_state_seq,
                       compare_output as _compare_output)
 
 
-__all__: Sequence[str] = 'exec_and_get_state_seq', 'compare_output'
+__all__: Sequence[LiteralString] = 'exec_and_get_state_seq', 'compare_output'
 
 
 @click.command(name='exec',

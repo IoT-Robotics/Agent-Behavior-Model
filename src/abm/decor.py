@@ -6,12 +6,12 @@ from functools import wraps
 from inspect import FullArgSpec, getfullargspec
 import json
 import re
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, Callable, LiteralString, Optional, TypeVar
 
 from . import interactive
 
 
-__all__: Sequence[str] = 'act', 'sense', 'STATE_SEQ'
+__all__: Sequence[LiteralString] = 'act', 'sense', 'STATE_SEQ'
 
 
 _OBJECT_MEMORY_PATTERN: str = ' object at 0x([0-9]|[a-f]|[A-F])+'

@@ -2,13 +2,14 @@
 
 
 from collections.abc import Sequence
+from typing import LiteralString
 
 import click
 
 from .exec import exec_and_get_state_seq, compare_output
 
 
-__all__: Sequence[str] = ('abm_cli',)
+__all__: Sequence[LiteralString] = ('abm_cli',)
 
 
 @click.group(name='abm',

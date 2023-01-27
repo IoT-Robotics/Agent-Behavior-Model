@@ -4,7 +4,7 @@
 from ast import (Name, Load, Store,
                  Assign, Call, Constant, Lambda, Module,
                  fix_missing_locations, parse, unparse)
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from copy import copy
 from getpass import getuser
 from inspect import stack
@@ -14,7 +14,7 @@ from pprint import pprint
 from shutil import copyfile
 from sys import executable
 from tempfile import NamedTemporaryFile
-from typing import Optional
+from typing import LiteralString, Optional
 
 from grader_support.gradelib import Grader
 from grader_support.graderutil import change_directory
@@ -26,6 +26,9 @@ configure(command='python', bin_path=executable, user=getuser())
 
 # pylint: disable=wrong-import-position
 from codejail.safe_exec import SafeExecException, safe_exec   # noqa: E402
+
+
+__all__: Sequence[LiteralString] = ('StateSeqGrader',)
 
 
 class StateSeqGrader(Grader):

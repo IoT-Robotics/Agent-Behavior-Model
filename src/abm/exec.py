@@ -10,12 +10,12 @@ from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from pprint import pprint
-from typing import Optional
+from typing import LiteralString, Optional
 
 from . import decor
 
 
-__all__: Sequence[str] = 'exec_and_get_state_seq', 'compare_output'
+__all__: Sequence[LiteralString] = 'exec_and_get_state_seq', 'compare_output'
 
 
 def exec_and_get_state_seq(
