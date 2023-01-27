@@ -19,7 +19,7 @@ __all__: Sequence[LiteralString] = 'exec_and_get_state_seq', 'compare_output'
 
 
 def exec_and_get_state_seq(
-        module_obj_or_script_file_path: Module | Path | str) -> list:
+        module_obj_or_script_file_path: Module | Path | LiteralString) -> list:
     """Execute Module object or script and get State Sequence."""
     # pylint: disable=exec-used
 
