@@ -1,6 +1,6 @@
 [project]
 name = 'Agent-Behavior-Model'
-version = '23.1.25'
+version = '23.2.10'
 
 description = 'Agent Behavior Model'
 readme = {file = 'README.md', content-type = 'text/markdown', charset = 'UTF-8'}
@@ -47,7 +47,7 @@ dependencies = [
   'Decorator >= 5.1.1',
   'Wrapt >= 1.14.1',
 
-  'EdX-CodeJail >= 3.3.1',
+  'EdX-CodeJail >= 3.3.2',
 ]
 
 
@@ -76,7 +76,7 @@ publish = [
 
 [build-system]
 requires = [
-  'SetUpTools >= 66.1.1',
+  'SetUpTools >= 67.2.0',
   'Wheel >= 0.38.4',
 ]
 build-backend = 'setuptools.build_meta'
