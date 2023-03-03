@@ -1,0 +1,4 @@
+[console_scripts]
+abm = abm.cli:abm_cli
+
+[gui_scripts]
