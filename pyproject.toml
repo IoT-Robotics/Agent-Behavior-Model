@@ -10,11 +10,11 @@ description = 'Agent Behavior Model'
 license = 'MIT'
 
 authors = [
-  'The Vinh LUONG (LƯƠNG Thế Vinh) <Vinh@STEAMforVietNam.org>'
+  'The Vinh LUONG (LƯƠNG Thế Vinh) <Vinh@STEAMforVietNam.org>',
 ]
 maintainers = [
   'The Vinh LUONG (LƯƠNG Thế Vinh) <Vinh@STEAMforVietNam.org>',
-  'STEAM for Vietnam Foundation: AI, IoT & Robotics Educational Initiative <Edu.AI@STEAMforVietNam.org>',
+  'STEAM for Vietnam Foundation: AI, IoT & Robotics Educational Initiative <Edu.Robotics@STEAMforVietNam.org>',
 ]
 
 readme = 'README.md'
