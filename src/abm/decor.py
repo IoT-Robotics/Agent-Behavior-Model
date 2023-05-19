@@ -3,7 +3,7 @@
 
 from collections.abc import Sequence
 from functools import wraps
-from inspect import signature
+from inspect import Signature, signature
 import json
 import re
 from typing import Any, Callable, LiteralString, Optional, TypeVar
@@ -90,10 +90,10 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         # pylint: disable=redefined-builtin,too-many-locals
         result: Any = sensing_func(*args, **kwargs)
 
-        (bound_args := signature(obj=sensing_func,
-                                 follow_wrapped=False,
-                                 globals=None, locals=None,
-                                 eval_str=False).bind(*args, **kwargs)
+        (bound_args := (sig := signature(obj=sensing_func,
+                                         follow_wrapped=False,
+                                         globals=None, locals=None,
+                                         eval_str=False)).bind(*args, **kwargs)
          ).apply_defaults()
 
         print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
@@ -117,11 +117,10 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         input_arg_strs: list[str] = [f'{k}={v}' for k, v in input_arg_dict_items]  # noqa: E501
 
         if set is None:
-            return_annotation: Optional[type] = \
-                sensing_func.__annotations__.get('return')
-            return_annotation_str: LiteralString = (f': {return_annotation}'
-                                                    if return_annotation
-                                                    else '')
+            return_annotation_str: LiteralString = (
+                f': {return_annotation}'
+                if (return_annotation := sig.return_annotation) != Signature.empty  # noqa: E501
+                else '')
             print_str: str = (f'SENSE: {self_dot_str}{sensing_func_name}'
                               f"({', '.join(input_arg_strs)})"
                               f'{return_annotation_str} = ')
