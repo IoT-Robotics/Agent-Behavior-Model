@@ -3,7 +3,7 @@
 
 from collections.abc import Sequence
 from functools import wraps
-from inspect import FullArgSpec, getfullargspec
+from inspect import BoundArguments, signature
 import json
 import re
 from typing import Any, Callable, LiteralString, Optional, TypeVar
@@ -22,44 +22,6 @@ _ACT_DECOR_FLAG: LiteralString = '__ACT_DECORATED__'
 _SENSE_DECOR_FLAG: LiteralString = '__SENSE_DECORATED__'
 
 STATE_SEQ: list = []
-
-
-def args_dict_from_func_and_given_args(func: CallableTypeVar,
-                                       *args: Any, **kwargs: Any) -> dict[str, Any]:  # noqa: E501
-    """Get arguments dict from function and given arguments."""
-    # extract function's argument specs
-    arg_spec: FullArgSpec = getfullargspec(func=func)
-    # kw_only_arg_names: list[str] = arg_spec.kwonlyargs
-    # kw_only_var_arg_name: Optional[str] = arg_spec.varkw
-
-    # get number of matched positional arguments
-    n_matched_pos_args: int = min(len(pos_arg_names := arg_spec.args),
-                                  n_args := len(args))
-
-    # initialize args_dict with matched positional arguments and given kwargs
-    args_dict: dict[str, Any] = dict(zip(pos_arg_names[:n_matched_pos_args],
-                                         args[:n_matched_pos_args])) | kwargs
-
-    # insert positional argument defaults where applicable
-    if (pos_arg_defaults_tup := arg_spec.defaults):
-        # pylint: disable=invalid-name
-        for k, v in zip(pos_arg_names[-len(pos_arg_defaults_tup):],
-                        pos_arg_defaults_tup):
-            if k not in args_dict:
-                args_dict[k] = v
-
-    # record positional varargs where applicable
-    if arg_spec.varargs and ((n_var_args := n_args - n_matched_pos_args) > 0):
-        args_dict['VARARGS'] = args[-n_var_args:]
-
-    # insert keyword-only argument defaults where applicable
-    if (kw_only_arg_defaults := arg_spec.kwonlydefaults):
-        # pylint: disable=invalid-name
-        for k, v in kw_only_arg_defaults.items():
-            if k not in args_dict:
-                args_dict[k] = v
-
-    return args_dict
 
 
 def sanitize_object_name(obj: Any) -> Optional[str]:
@@ -88,17 +50,21 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     def decor_actuating_func(*args: Any, **kwargs: Any) -> tuple[str, dict[str, Any]]:  # noqa: E501
         actuating_func(*args, **kwargs)
 
-        args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(actuating_func, *args, **kwargs)
+        bound_args: BoundArguments = (
+            signature(obj=actuating_func, follow_wrapped=False,
+                      globals=None, locals=None, eval_str=False)
+            .bind(*args, **kwargs))
 
-        print_args: dict[str, Any] = args_dict.copy()
+        bound_args.apply_defaults()
+
+        print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
         input_arg_strs: list[str] = [f'{k}={v}' for k, v in print_args.items()]
         self_name: Optional[str] = sanitize_object_name(self_arg)
         print((f'ACT: {self_name}.' if self_name else 'ACT: ') +
               f"{actuating_func.__name__}({', '.join(input_arg_strs)})")
 
-        result: tuple[str, dict] = actuating_func.__qualname__, args_dict
+        result: tuple[str, dict[str, Any]] = actuating_func.__qualname__, args_dict  # noqa: E501
 
         global STATE_SEQ  # pylint: disable=global-variable-not-assigned
         STATE_SEQ.append(result)
@@ -125,10 +91,14 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         # pylint: disable=redefined-builtin,too-many-locals
         result: Any = sensing_func(*args, **kwargs)
 
-        args_dict: dict[str, Any] = \
-            args_dict_from_func_and_given_args(sensing_func, *args, **kwargs)
+        bound_args: BoundArguments = (
+            signature(obj=sensing_func, follow_wrapped=False,
+                      globals=None, locals=None, eval_str=False)
+            .bind(*args, **kwargs))
 
-        print_args: dict[str, Any] = args_dict.copy()
+        bound_args.apply_defaults()
+
+        print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
 
         # get self
         if (self := print_args.pop('self', None)):
