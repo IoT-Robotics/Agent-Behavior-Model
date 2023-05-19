@@ -3,7 +3,7 @@
 
 from collections.abc import Sequence
 from functools import wraps
-from inspect import BoundArguments, signature
+from inspect import signature
 import json
 import re
 from typing import Any, Callable, LiteralString, Optional, TypeVar
@@ -50,12 +50,11 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     def decor_actuating_func(*args: Any, **kwargs: Any) -> tuple[str, dict[str, Any]]:  # noqa: E501
         actuating_func(*args, **kwargs)
 
-        bound_args: BoundArguments = (
-            signature(obj=actuating_func, follow_wrapped=False,
-                      globals=None, locals=None, eval_str=False)
-            .bind(*args, **kwargs))
-
-        bound_args.apply_defaults()
+        (bound_args := signature(obj=actuating_func,
+                                 follow_wrapped=False,
+                                 globals=None, locals=None,
+                                 eval_str=False).bind(*args, **kwargs)
+         ).apply_defaults()
 
         print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
@@ -91,12 +90,11 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         # pylint: disable=redefined-builtin,too-many-locals
         result: Any = sensing_func(*args, **kwargs)
 
-        bound_args: BoundArguments = (
-            signature(obj=sensing_func, follow_wrapped=False,
-                      globals=None, locals=None, eval_str=False)
-            .bind(*args, **kwargs))
-
-        bound_args.apply_defaults()
+        (bound_args := signature(obj=sensing_func,
+                                 follow_wrapped=False,
+                                 globals=None, locals=None,
+                                 eval_str=False).bind(*args, **kwargs)
+         ).apply_defaults()
 
         print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
 
