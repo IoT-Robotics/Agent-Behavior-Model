@@ -55,6 +55,8 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
                       globals=None, locals=None, eval_str=False)
             .bind(*args, **kwargs))
 
+        bound_args.apply_defaults()
+
         print_args: dict[str, Any] = bound_args.copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
         input_arg_strs: list[str] = [f'{k}={v}' for k, v in print_args.items()]
@@ -93,6 +95,8 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
             signature(obj=sensing_func, follow_wrapped=False,
                       globals=None, locals=None, eval_str=False)
             .bind(*args, **kwargs))
+
+        bound_args.apply_defaults()
 
         print_args: dict[str, Any] = bound_args.copy()
 
