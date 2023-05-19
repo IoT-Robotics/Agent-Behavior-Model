@@ -47,7 +47,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(actuating_func)
 
     @wraps(actuating_func)
-    def decor_actuating_func(*args: Any, **kwargs: Any) -> BoundArguments:
+    def decor_actuating_func(*args: Any, **kwargs: Any) -> dict[str, Any]:
         actuating_func(*args, **kwargs)
 
         bound_args: BoundArguments = (
@@ -57,14 +57,14 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
 
         bound_args.apply_defaults()
 
-        print_args: dict[str, Any] = bound_args.copy()
+        print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
         self_arg: Optional[Any] = print_args.pop('self', None)
         input_arg_strs: list[str] = [f'{k}={v}' for k, v in print_args.items()]
         self_name: Optional[str] = sanitize_object_name(self_arg)
         print((f'ACT: {self_name}.' if self_name else 'ACT: ') +
               f"{actuating_func.__name__}({', '.join(input_arg_strs)})")
 
-        result: tuple[str, dict] = actuating_func.__qualname__, bound_args
+        result: tuple[str, dict] = actuating_func.__qualname__, args_dict
 
         global STATE_SEQ  # pylint: disable=global-variable-not-assigned
         STATE_SEQ.append(result)
@@ -98,7 +98,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
         bound_args.apply_defaults()
 
-        print_args: dict[str, Any] = bound_args.copy()
+        print_args: dict[str, Any] = (args_dict := bound_args.arguments).copy()
 
         # get self
         if (self := print_args.pop('self', None)):
@@ -156,7 +156,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
                 print(f'{print_str}{return_value}')
 
             global STATE_SEQ  # pylint: disable=global-variable-not-assigned
-            STATE_SEQ.append((sensing_func.__qualname__, bound_args, return_value))  # noqa: E501
+            STATE_SEQ.append((sensing_func.__qualname__, args_dict, return_value))  # noqa: E501
 
             return return_value
 
