@@ -47,7 +47,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
     check_decor_status(actuating_func)
 
     @wraps(actuating_func)
-    def decor_actuating_func(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    def decor_actuating_func(*args: Any, **kwargs: Any) -> tuple[str, dict[str, Any]]:  # noqa: E501
         actuating_func(*args, **kwargs)
 
         bound_args: BoundArguments = (
@@ -64,7 +64,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
         print((f'ACT: {self_name}.' if self_name else 'ACT: ') +
               f"{actuating_func.__name__}({', '.join(input_arg_strs)})")
 
-        result: tuple[str, dict] = actuating_func.__qualname__, args_dict
+        result: tuple[str, dict[str, Any]] = actuating_func.__qualname__, args_dict  # noqa: E501
 
         global STATE_SEQ  # pylint: disable=global-variable-not-assigned
         STATE_SEQ.append(result)
