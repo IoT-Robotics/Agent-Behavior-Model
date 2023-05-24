@@ -17,8 +17,8 @@ jobs:
       matrix:
         python-version:
           - 3.11
-          # github.com/actions/python-versions/blob/main/versions-manifest.json
           - 3.12.0-alpha.7
+          # github.com/actions/python-versions/blob/main/versions-manifest.json
 
     steps:
       - name: Checkout Repo
