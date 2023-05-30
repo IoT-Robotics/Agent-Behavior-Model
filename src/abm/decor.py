@@ -61,7 +61,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
         input_arg_strs: list[str] = [f'{k}={v}' for k, v in print_args.items()]
         self_name: Optional[str] = sanitize_object_name(self_arg)
         print((f'ACT: {self_name}.' if self_name else 'ACT: ') +
-              f"{actuating_func.__name__}({', '.join(input_arg_strs)})")
+              f"{actuating_func.__qualname__}({', '.join(input_arg_strs)})")
 
         result: tuple[str, dict[str, Any]] = actuating_func.__qualname__, args_dict  # noqa: E501
 
@@ -83,7 +83,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
 
     # name of private dict storing current sensing states
     sensing_state_dict_name: LiteralString = \
-        f'_{(sensing_func_name := sensing_func.__name__)}'
+        f'_{(sensing_func_name := sensing_func.__qualname__)}'
 
     @wraps(sensing_func)
     def decor_sensing_func(*args: Any, set: Any = None, **kwargs: Any) -> Any:
