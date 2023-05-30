@@ -31,7 +31,7 @@ def sanitize_object_name(obj: Any) -> Optional[str]:
             else re.sub(_OBJECT_MEMORY_PATTERN, '', str(obj)))
 
 
-def check_decor_status(func: callable, /) -> Optional[AssertionError]:
+def check_decor_status(func: Callable, /) -> Optional[AssertionError]:
     """Ensure function has NOT been `act`- or `sense`-decorated."""
     assert not getattr(func, _ACT_DECOR_FLAG, False), \
         f'*** {func} ALREADY `act`-DECORATED ***'
@@ -51,7 +51,7 @@ def act(actuating_func: CallableTypeVar, /) -> CallableTypeVar:
         actuating_func(*args, **kwargs)
 
         (bound_args := signature(obj=actuating_func,
-                                 follow_wrapped=False,
+                                 follow_wrapped=True,
                                  globals=None, locals=None,
                                  eval_str=False).bind(*args, **kwargs)
          ).apply_defaults()
@@ -91,7 +91,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
         result: Any = sensing_func(*args, **kwargs)
 
         (bound_args := (sig := signature(obj=sensing_func,
-                                         follow_wrapped=False,
+                                         follow_wrapped=True,
                                          globals=None, locals=None,
                                          eval_str=False)).bind(*args, **kwargs)
          ).apply_defaults()
@@ -103,7 +103,7 @@ def sense(sensing_func: CallableTypeVar, /) -> CallableTypeVar:
             self_dot_str: str = f'{self}.'
 
         else:
-            self: callable = sensing_func
+            self: Callable = sensing_func
             self_dot_str: LiteralString = ''
 
         # private dict storing current sensing states
