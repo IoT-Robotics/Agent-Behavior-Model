@@ -1,4 +1,4 @@
-CLICK >= 8.1.3
+CLICK >= 8.1.5
 
 Decorator >= 5.1.1
 Wrapt >= 1.15.0
