@@ -1,6 +1,6 @@
 CLICK >= 8.1.7
 
 Decorator >= 5.1.1
-Wrapt >= 1.15.0
+Wrapt >= 1.16.0
 
 EdX-CodeJail >= 3.3.3
